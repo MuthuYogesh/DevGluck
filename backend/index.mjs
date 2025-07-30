@@ -10,23 +10,26 @@ import router from "./src/routes/route.mjs";
 
 const app = express();
 
-const allowedOrigins = [
-  feUrlDev,           // for local dev
-  feUrlProd      // your Vercel frontend
-];
+const allowedOrigins = [feUrlDev, feUrlProd];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error("CORS not allowed"));
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow preflight
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests explicitly for Deployment
+app.options("*", cors());
 
 app.use(express.json());
 
