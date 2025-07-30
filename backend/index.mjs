@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
 import cors from 'cors';
-import { PORT, mongodb } from "./config.mjs";
+import { PORT, feUrlDev, feUrlProd, mongodb } from "./config.mjs";
 import http from 'http';
 import { initSocket } from './src/socket/socket.mjs';
 import router from "./src/routes/route.mjs";
@@ -10,12 +10,23 @@ import router from "./src/routes/route.mjs";
 
 const app = express();
 
-app.use(cors(
-  {
-    origin: "http://localhost:5173",
+const allowedOrigins = [
+  feUrlDev,           // for local dev
+  feUrlProd      // your Vercel frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-  }
-));
+  })
+);
 
 app.use(express.json());
 

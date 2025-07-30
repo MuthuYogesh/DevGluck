@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 const user = JSON.parse(localStorage.getItem("currentUser"));
 console.log("Current user:", user?.user?._id);
 
-const socket = io("http://localhost:8000", {
+const socket = io(import.meta.env.VITE_API_URL, {
     query: {
         userId: user?.user?._id,
     },

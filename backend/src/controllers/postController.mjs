@@ -1,30 +1,30 @@
 import { Post } from "../models/postModel.mjs";
 import { Like } from "../models/likeModel.mjs";
 import { Comment } from "../models/commentModel.mjs";
-import { uploadImage } from "../aws/aws.mjs";
+// import { uploadImage } from "../aws/aws.mjs";
 
 // Create a new post
 export const addNewPost = async (req, res) => {
   try {
     console.log("Post creation request:", {
       body: req.body,
-      file: req.file ? { 
-        originalname: req.file.originalname, 
-        mimetype: req.file.mimetype, 
-        size: req.file.size 
+      file: req.file ? {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
       } : null,
       user: req.user._id
     });
 
     const { content } = req.body;
     const author = req.user._id;
-    
+
     if (!content && !req.file) {
       return res.status(400).json({ message: "Post content or media required." });
     }
 
     let mediaUrl = null; // No default image when no file is uploaded
-    
+
     // Handle file upload
     if (req.file) {
       try {
@@ -35,7 +35,7 @@ export const addNewPost = async (req, res) => {
       } catch (uploadError) {
         console.error("Image upload failed:", uploadError);
         console.log("Falling back to base64 storage...");
-        
+
         // Fallback to base64 storage
         const base64Data = req.file.buffer.toString('base64');
         const mimeType = req.file.mimetype;
@@ -49,14 +49,14 @@ export const addNewPost = async (req, res) => {
       author,
       content,
     };
-    
+
     // Only add media field if an image was uploaded
     if (mediaUrl) {
       postData.media = mediaUrl;
     }
-    
+
     const post = await Post.create(postData);
-    
+
     // Populate author info before sending response
     await post.populate("author", "firstName lastName avatar username");
     // Add name field to author for frontend compatibility
@@ -67,8 +67,8 @@ export const addNewPost = async (req, res) => {
     res.status(201).json(post);
   } catch (err) {
     console.error("Post creation error:", err);
-    res.status(500).json({ 
-      message: "Failed to create post", 
+    res.status(500).json({
+      message: "Failed to create post",
       error: err.message,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
@@ -81,7 +81,7 @@ export const getAllPosts = async (req, res) => {
     const posts = await Post.find({ isDeleted: false })
       .sort({ createdAt: -1 })
       .populate("author", "firstName lastName avatar username");
-    
+
     // Add name field to each post's author for frontend compatibility
     posts.forEach(post => {
       if (post.author) {
@@ -101,7 +101,7 @@ export const getUserPosts = async (req, res) => {
     const posts = await Post.find({ author: userId, isDeleted: false })
       .sort({ createdAt: -1 })
       .populate("author", "firstName lastName avatar username");
-    
+
     // Add name field to each post's author for frontend compatibility
     posts.forEach(post => {
       if (post.author) {
@@ -190,7 +190,7 @@ export const getCommentsOfPost = async (req, res) => {
     const comments = await Comment.find({ postId, isDeleted: false })
       .sort({ createdAt: 1 })
       .populate("userId", "firstName lastName avatar username");
-    
+
     // Add name field to each comment's user for frontend compatibility
     comments.forEach(comment => {
       if (comment.userId) {

@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { createMessage } from "../utils/messageService.mjs";
+import { feUrlDev, feUrlProd } from "../../config.mjs";
 
 const userSocketMap = {};
 export const getReceiverSocketId = (receiverId) => userSocketMap[receiverId];
@@ -9,7 +10,10 @@ export let io;
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: [
+                feUrlDev,
+                feUrlProd
+            ],
             methods: ["GET", "POST"],
             credentials: true,
         },

@@ -2,20 +2,16 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const accessKeyId= process.env.accessKeyId;
-const secretAccessKey=process.env.secretAccessKey;
-const region = process.env.region;
-const bucketName = process.env.bucketName;
-const mongodb=process.env.MongoDB;
-const PORT= process.env.PORT;
-const secretMessage= process.env.secretMessage;
+const mongodb = process.env.MongoDB;
+const PORT = process.env.PORT;
+const secretMessage = process.env.secretMessage;
+const feUrlDev = process.env.FRONTEND_URL_DEV;
+const feUrlProd = process.env.FRONTEND_URL_PROD
 
 export {
-    accessKeyId, 
-    secretAccessKey, 
-    region, 
-    bucketName,
-    mongodb, 
-    PORT, 
+    feUrlDev,
+    feUrlProd,
+    mongodb,
+    PORT,
     secretMessage
 }
